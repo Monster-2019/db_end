@@ -2,11 +2,12 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const app = express()
+const router = express.Router()
 
-const User = require('./models/user')
+const TopicModel = require('./models/topic')
 
 const port = 5000
-const url = 'mongodb://127.0.0.1:27017/douban'
+const url = 'mongodb://dbAdmin:dd123456@121.199.51.37:27017/douban'
 
 mongoose.connect(url, { useNewUrlParser: true })
 mongoose.connection.once('open', _ => {
@@ -26,6 +27,7 @@ app.listen(port, function () {
     console.log(`listening on port ${port}`)
 })
 
+
 app.all('*', (req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
@@ -35,31 +37,37 @@ app.all('*', (req, res, next) => {
     next();
 })
 
-app.get('/', (req, res) => {
-    User.find({}, {_id: 0, __v: 0}, (err, docs) => {
+app.use('/api', router)
+
+router.get('/topic', (req, res) => {
+    let { page, limit } = req.query
+    let skip = (page - 1) * limit
+    TopicModel.find({}, { _id: 0, __v: 0 }, { limit: 10, skip: skip }, (err, docs) => {
         if (!err) {
             let result = {
                 code: 1,
                 data: {
                     list: docs,
+                    page: Number(page),
+                    limit: Number(limit),
                     total: docs.length
                 },
                 msg: 'success'
             }
             res.json(formatJson(result))
         } else {
-            res.json({code: 0, msg: "error"})
+            res.json({ code: 0, msg: "error" })
         }
     })
 })
 
-app.post('/quotes', (req, res) => {
-    User.create(req.body, (err) => {
-        if (!err) {
-            console.log('创建成功', req.body)
-            res.redirect('/')
-        } else {
-            console.log(err)
-        }
-    })
-})
+// app.post('/quotes', (req, res) => {
+//     TopicModel.create(req.body, (err) => {
+//         if (!err) {
+//             console.log('创建成功', req.body)
+//             res.redirect('/')
+//         } else {
+//             console.log(err)
+//         }
+//     })
+// })
