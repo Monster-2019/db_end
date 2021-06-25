@@ -2,8 +2,16 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const topicSchema = new Schema({
-  title: String,
-  time: String,
+  title: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
+  time: {
+    type: String,
+    required: true,
+  },
   route: Array,
   subWay: Array,
   direction: Array,
@@ -14,7 +22,10 @@ const topicSchema = new Schema({
   mode: String,
   amount: Array,
   phone: String,
-  url: String
+  url: {
+    type: String,
+    required: true
+  }
 })
 
 module.exports = mongoose.model('rent_room_list', topicSchema)
