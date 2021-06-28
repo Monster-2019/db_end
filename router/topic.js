@@ -6,20 +6,28 @@ const { formatJson } = require('../utils/index')
 const TopicModel = require('../models/topic')
 
 router.get('/topic', (req, res) => {
-  let { page, limit } = {
-    page: 1,
-    limit: 10,
-    ...req.query
-  }
+  let { 
+    page = 1,
+    limit = 10,
+    minAmount = 0,
+    maxAmount = 99999,
+    ...rest 
+  } = req.query
   page = Number(page)
   limit = Number(limit)
   let skip = (page - 1) * limit
-  TopicModel.find({}, { title: 1 })
+
+  if (rest.route) rest.route = rest.route.split(',')
+  if (rest.subWay) rest.subWay = rest.subWay.split(',')
+  if (rest.direction) rest.direction = rest.direction.split(',')
+  if (minAmount !== 0 || maxAmount !== 99999) rest.amount = { $gte: Number(minAmount), $lte: Number(maxAmount) }
+
+  TopicModel.find({ ...rest }, { url: 1 })
     .then(res => {
       return res.length
     })
     .then(total => {
-      TopicModel.find({}, { _id: 0 }, { limit: limit, skip: skip, sort: { time: -1 } }, (err, docs) => {
+      TopicModel.find({ ...rest }, { _id: 0 }, { limit: limit, skip: skip, sort: { time: -1 } }, (err, docs) => {
         if (!err) {
           let result = {
             code: 1,
@@ -33,7 +41,6 @@ router.get('/topic', (req, res) => {
           }
           res.json(formatJson(result))
         } else {
-          console.log(err)
           res.json({ code: 0, msg: err })
         }
       })
@@ -56,5 +63,20 @@ router.post('/topic', async (req, res) => {
     }
   })
 })
+
+// router.put('/topicAll', async (req, res) => {
+//   await TopicModel.find({}, async function (err, topic) {
+//     console.log(topic.length)
+//     topic.forEach(item => {
+//       let amount = item.amount.map(num => Number(num)).filter(num => num !== 2021)
+//       TopicModel.findOneAndUpdate({ url: item.url}, { amount }, function(err, topic) {
+//         if (err) {
+//           console.log(1)
+//         }
+//       })
+//     })
+//     res.json({ code: 1, data: formatJson(topic) })
+//   })
+// })
 
 module.exports = router
