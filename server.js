@@ -7,7 +7,11 @@ const TopicRouter = require('./router/topic')
 const port = 5000
 const url = 'mongodb://dbAdmin:dd123456@121.199.51.37:27017/douban'
 
-mongoose.connect(url, { useNewUrlParser: true })
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+
+mongoose.connect(url)
 mongoose.connection.once('open', _ => {
     console.log('Database connected:', url)
 })

@@ -11,26 +11,29 @@ router.get('/topic', (req, res) => {
     limit: 10,
     ...req.query
   }
+  page = Number(page)
+  limit = Number(limit)
   let skip = (page - 1) * limit
   TopicModel.find({}, { title: 1 })
     .then(res => {
       return res.length
     })
     .then(total => {
-      TopicModel.find({}, { _id: 0 }, { limit: 10, skip: skip, sort: { time: -1 } }, (err, docs) => {
+      TopicModel.find({}, { _id: 0 }, { limit: limit, skip: skip, sort: { time: -1 } }, (err, docs) => {
         if (!err) {
           let result = {
             code: 1,
             data: {
               list: docs,
-              page: Number(page),
-              limit: Number(limit),
+              page: page,
+              limit: limit,
               total: total
             },
             msg: 'success'
           }
           res.json(formatJson(result))
         } else {
+          console.log(err)
           res.json({ code: 0, msg: err })
         }
       })
@@ -39,15 +42,13 @@ router.get('/topic', (req, res) => {
 
 router.post('/topic', async (req, res) => {
   let { url } = req.body
-  await TopicModel.findOne({ url }, async function (err, topic) {
-    if (topic === null) {
+  await TopicModel.findOne({ url }, async function (err, isTopic) {
+    if (isTopic === null) {
       await TopicModel.create(req.body)
-        .then(res => {
-          console.log(res)
-          res.json({ code: 1, data: formatJson(res) })
+        .then(topic => {
+          res.json({ code: 1, data: formatJson(topic) })
         })
         .catch(err => {
-          console.log(1)
           res.json({ code: 0, msg: err })
         })
     } else {
