@@ -23,7 +23,7 @@ mongoose.connection.once('error', err => {
 // app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-app.listen(port, function () {
+app.listen(port, '0.0.0.0', function () {
     console.log(`listening on port ${port}`)
 })
 
