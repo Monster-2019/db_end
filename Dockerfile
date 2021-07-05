@@ -1,7 +1,3 @@
-FROM nginx:stable-alpine
-
-COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-
 FROM node:lts-alpine as builder
 
 RUN mkdir -p /app
