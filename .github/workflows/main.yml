@@ -62,6 +62,6 @@ jobs:
           script: |
             docker stop db_end
             docker pull dongsanjin/db_end:main
-            docker create --rm -p 5001:5001 --name db_end dongsanjin/db_end:main
+            docker create --rm -p 5001:80 --name db_end dongsanjin/db_end:main
             docker cp /var/local/db_end/.env db_end:/app
             docker start db_end
