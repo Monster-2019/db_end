@@ -5,8 +5,8 @@ const app = express()
 const TopicRouter = require('./router/topic')
 require('dotenv').config()
 
-const port = process.env.PORT || 5001
-const url = process.env.DB_URL || "mongodb://dbAdmin:dd123456@121.199.51.37:27017/douban"
+const port = process.env.PORT
+const url = process.env.DB_URL
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
