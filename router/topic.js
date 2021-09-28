@@ -22,9 +22,9 @@ router.get('/topic', (req, res) => {
   if (rest.direction) rest.direction = rest.direction.split(',')
   if (minAmount !== 0 || maxAmount !== 99999) rest.amount = { $gte: Number(minAmount), $lte: Number(maxAmount) }
 
-  TopicModel.find({ ...rest }, { _id: 1 })
+  TopicModel.count({ ...rest })
     .then(res => {
-      return res.length
+      return res
     })
     .then(total => {
       TopicModel.find({ ...rest }, { _id: 0 }, { limit: limit, skip: skip, sort: { time: -1 } }, (err, docs) => {
