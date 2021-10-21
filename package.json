@@ -12,12 +12,12 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "casbin": "^5.9.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "mongoose": "^5.12.10"
   },
   "devDependencies": {
+    "moment": "^2.29.1",
     "nodemon": "^2.0.7",
     "pm2": "^5.1.0"
   }

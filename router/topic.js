@@ -1,4 +1,5 @@
 const express = require('express')
+const moment = require('moment');
 const router = express.Router()
 
 const { formatJson } = require('../utils/index')
@@ -17,9 +18,8 @@ router.get('/topic', (req, res) => {
   limit = Number(limit)
   let skip = (page - 1) * limit
 
-  if (rest.route) rest.route = rest.route.split(',')
-  if (rest.subWay) rest.subWay = rest.subWay.split(',')
-  if (rest.direction) rest.direction = rest.direction.split(',')
+  if (rest.route) rest.route = { $in: rest.route.split(',') }
+  if (rest.subWay) rest.subWay = { $in: rest.subWay.split(',') }
   if (minAmount !== 0 || maxAmount !== 99999) rest.amount = { $gte: Number(minAmount), $lte: Number(maxAmount) }
 
   TopicModel.count({ ...rest })
@@ -27,15 +27,19 @@ router.get('/topic', (req, res) => {
       return res
     })
     .then(total => {
-      TopicModel.find({ ...rest }, { _id: 0 }, { limit: limit, skip: skip, sort: { time: -1 } }, (err, docs) => {
+      TopicModel.find({ ...rest }, { _id: 0, __v: 0, direction: 0 }, { limit: limit, skip: skip, sort: { time: -1 }, lean: true }, (err, docs) => {
         if (!err) {
+          let list = [...docs]
           let result = {
             code: 1,
             data: {
-              list: docs,
-              page: page,
-              limit: limit,
-              total: total
+              list: list.map(item => {
+                item.createTime = moment(Number(item.time)).format('YYYY-MM-DD hh:mm')
+                return item
+              }),
+              page,
+              limit,
+              total
             },
             msg: 'success'
           }
